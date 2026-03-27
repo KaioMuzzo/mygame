@@ -1,0 +1,1 @@
+// exportar aqui quando houver tipos/schemas

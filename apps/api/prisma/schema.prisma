@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id         String      @id @default(uuid())
+  username   String      @unique
+  email      String      @unique
+  password   String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  characters Character[]
+}
+
+model Character {
+  id             String          @id @default(uuid())
+  userId         String
+  user           User            @relation(fields: [userId], references: [id])
+  name           String
+  level          Int             @default(1)
+  xp             Int             @default(0)
+  pointsTotal    Int             @default(0)
+  pointsSpent    Int             @default(0)
+  strength       Int             @default(0)
+  magic          Int             @default(0)
+  vitality       Int             @default(0)
+  armor          Int             @default(0)
+  resistance     Int             @default(0)
+  stamina        Int             @default(0)
+  agility        Int             @default(0)
+  focus          Int             @default(0)
+  luck           Int             @default(0)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  inventory      InventoryItem[]
+  cardCollection CharacterCard[]
+  deck           DeckCard[]
+}
+
+model Card {
+  id          String          @id @default(uuid())
+  key         String          @unique
+  name        String
+  description String
+  manaCost    Int             @default(0)
+  staminaCost Int             @default(0)
+  createdAt   DateTime        @default(now())
+  ownedBy     CharacterCard[]
+  inDecks     DeckCard[]
+}
+
+model CharacterCard {
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id])
+  cardId      String
+  card        Card      @relation(fields: [cardId], references: [id])
+  acquiredAt  DateTime  @default(now())
+
+  @@unique([characterId, cardId])
+}
+
+model DeckCard {
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id])
+  cardId      String
+  card        Card      @relation(fields: [cardId], references: [id])
+  slotIndex   Int
+
+  @@unique([characterId, slotIndex])
+}
+
+model Equipment {
+  id          String          @id @default(uuid())
+  key         String          @unique
+  name        String
+  description String
+  slot        EquipmentSlot
+  strength    Int             @default(0)
+  magic       Int             @default(0)
+  vitality    Int             @default(0)
+  armor       Int             @default(0)
+  resistance  Int             @default(0)
+  stamina     Int             @default(0)
+  agility     Int             @default(0)
+  focus       Int             @default(0)
+  luck        Int             @default(0)
+  createdAt   DateTime        @default(now())
+  inventory   InventoryItem[]
+}
+
+model InventoryItem {
+  id          String    @id @default(uuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id])
+  equipmentId String
+  equipment   Equipment @relation(fields: [equipmentId], references: [id])
+  equipped    Boolean   @default(false)
+  acquiredAt  DateTime  @default(now())
+}
+
+enum EquipmentSlot {
+  HEAD
+  CHEST
+  LEGS
+  FEET
+  HANDS
+  WEAPON
+  OFFHAND
+  RING
+  AMULET
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@browsergame/web",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "pnpm dlx @tailwindcss/cli -i ./src/styles/main.css -o ./public/output.css --watch",
+    "build": "pnpm dlx @tailwindcss/cli -i ./src/styles/main.css -o ./public/output.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "^4.2.2"
+  },
+  "dependencies": {
+    "@browsergame/shared": "workspace:*"
+  }
+}

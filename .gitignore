@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+generated/
+
+# Build outputs
+dist/
+apps/web/public/output.css
+
+# Environment
+.env
+.env.*
+!.env.example
+
+
+# TypeScript
+*.tsbuildinfo
+
+# OS
+.DS_Store
