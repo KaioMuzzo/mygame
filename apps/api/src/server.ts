@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from 'express';
 import { env } from './env.js';
 import { prisma } from './lib/prisma.js';
 import { router } from './routes.js';
+import { errorHandler } from './middleware/errorHandler.js';
 
 const app = express();
 
@@ -14,10 +15,7 @@ app.get('/health', (_req: Request, res: Response) => {
     res.json({ status: 'ok' });
 });
 
-app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
-    console.error(err);
-    res.status(500).json({ error: 'Internal server error' });
-});
+app.use(errorHandler);
 
 const PORT = env['PORT'];
 

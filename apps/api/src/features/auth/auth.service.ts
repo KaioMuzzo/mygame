@@ -18,4 +18,4 @@ async function register(data: RegisterInput) {
     return user;
 }
 
-export const authService = { register };
+export const authService = { register }

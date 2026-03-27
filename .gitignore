@@ -17,3 +17,6 @@ apps/web/public/output.css
 
 # OS
 .DS_Store
+
+# Notes and orientations
+CLAUDE.md
