@@ -9,16 +9,24 @@ const globalLimiter = rateLimit ({
     message: { code: ErrorCode.TOO_MANY_REQUESTS },
 });
 
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
+const loginLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    standardHeaders: 'draft-8',
+    legacyHeaders: false,
+    message: { code: ErrorCode.TOO_MANY_REQUESTS },
+});
+
+const registerLimiter = rateLimit({
+    windowMs: 60 * 1000,
     max: 5,
     standardHeaders: 'draft-8',
     legacyHeaders: false,
     message: { code: ErrorCode.TOO_MANY_REQUESTS },
 });
 
-
 export {
     globalLimiter,
-    authLimiter
+    loginLimiter,
+    registerLimiter
 }

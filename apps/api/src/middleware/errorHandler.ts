@@ -25,7 +25,7 @@ function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFun
         const meta = err.meta?.driverAdapterError as DriverAdapterMeta | undefined;
         const index = meta?.cause?.constraint?.index;
         
-        if (env['NODE_ENV'] === 'development') {
+        if (env.NODE_ENV === 'development') {
             console.error('[P2002] constraint index:', index);
         }
 

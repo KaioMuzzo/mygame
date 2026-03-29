@@ -18,7 +18,7 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use(errorHandler);
 
-const PORT = env['PORT'];
+const PORT = env.PORT;
 
 app.listen(PORT, async () => {
     await prisma.$connect ();

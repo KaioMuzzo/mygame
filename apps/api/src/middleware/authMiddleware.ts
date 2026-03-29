@@ -14,7 +14,7 @@ function authMiddleware(req: Request, _res: Response, next: NextFunction) {
     const token = authorization.split(' ')[1]!;
 
     try {
-        const payload = jwt.verify(token, env['JWT_SECRET']);
+        const payload = jwt.verify(token, env.JWT_SECRET);
 
         if (typeof payload === 'string' || !payload.sub) {
             throw new AppError(ErrorCode.INVALID_TOKEN, 401);
