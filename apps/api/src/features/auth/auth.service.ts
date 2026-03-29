@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { LoginInput, RegisterInput } from './auth.schema';
+import type { LoginInput, RefreshInput, RegisterInput } from './auth.schema';
 import { prisma } from '../../lib/prisma';
 import { env } from '../../env';
 import { ErrorCode } from '../../constants/errorCodes';
@@ -51,7 +51,7 @@ async function login(data: LoginInput) {
                 userId: user.id,
                 expiresAt,
             }
-        })
+        });
 
         return { accessToken, refreshToken };
     } else {
@@ -59,7 +59,49 @@ async function login(data: LoginInput) {
     }
 }
 
+async function refresh(data: RefreshInput) {
+    try {
+        const payload = jwt.verify(data.refreshToken, env['JWT_REFRESH_SECRET']);
+    
+        if (typeof payload === 'string' || !payload.sub) {
+            throw new AppError(ErrorCode.REFRESH_TOKEN_INVALID, 401);
+        }
+
+        const token = await prisma.refreshToken.findUnique({
+            where: { token: data.refreshToken },
+        });
+
+        if (!token) {
+            throw new AppError(ErrorCode.REFRESH_TOKEN_INVALID, 401);
+        }
+
+        const accessToken = jwt.sign({ sub: payload.sub }, env['JWT_SECRET'], { expiresIn: env['JWT_EXPIRES_IN'] });
+        const refreshToken = jwt.sign({ sub: payload.sub }, env['JWT_REFRESH_SECRET'], { expiresIn: env['JWT_REFRESH_EXPIRES_IN'] });
+        const expiresAt = new Date(Date.now() + ms(env['JWT_REFRESH_EXPIRES_IN']));
+
+        await prisma.$transaction([
+            prisma.refreshToken.delete({
+                where: { token: data.refreshToken }
+            }),
+
+            prisma.refreshToken.create({
+                data: {
+                    token: refreshToken,
+                    userId: payload.sub,
+                    expiresAt,
+                }
+            }),
+        ]);
+
+        return { accessToken, refreshToken };
+    } catch (err) {
+        if (err instanceof AppError) throw err;
+        throw new AppError(ErrorCode.REFRESH_TOKEN_INVALID, 401)
+    }
+}
+
 export const authService = {
     register,
-    login
+    login,
+    refresh
 }

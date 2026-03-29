@@ -24,7 +24,6 @@ model RefreshToken {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
   expiresAt DateTime
-  revoked   Boolean  @default(false)
   createdAt DateTime @default(now())
 }
 
