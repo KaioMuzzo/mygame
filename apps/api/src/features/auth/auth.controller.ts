@@ -1,4 +1,4 @@
-import { loginSchema, refreshSchema, registerSchema } from "./auth.schema";
+import { loginSchema, logoutSchema, refreshSchema, registerSchema } from "./auth.schema";
 import { authService } from "./auth.service";
 import { asyncHandler } from "../../middleware/asyncHandler";
 import type { RequestHandler } from "express";
@@ -19,10 +19,17 @@ const refresh: RequestHandler = asyncHandler(async (req, res) => {
     const body = refreshSchema.parse(req.body);
     const token = await authService.refresh(body);
     res.status(200).json(token);
-})
+});
+
+const logout: RequestHandler = asyncHandler(async (req, res) => {
+    const body = logoutSchema.parse(req.body);
+    await authService.logout(body);
+    res.status(204).send();
+});
 
 export {
     register,
     login,
-    refresh
+    refresh,
+    logout
 }

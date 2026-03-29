@@ -1,6 +1,6 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import type { LoginInput, RefreshInput, RegisterInput } from './auth.schema';
+import type { LoginInput, LogoutInput, RefreshInput, RegisterInput } from './auth.schema';
 import { prisma } from '../../lib/prisma';
 import { env } from '../../env';
 import { ErrorCode } from '../../constants/errorCodes';
@@ -100,8 +100,19 @@ async function refresh(data: RefreshInput) {
     }
 }
 
+async function logout(data: LogoutInput) {
+    try {
+        await prisma.refreshToken.delete({
+            where: { token: data.refreshToken },
+        });
+    } catch {
+        throw new AppError(ErrorCode.REFRESH_TOKEN_INVALID, 401);
+    }
+}
+
 export const authService = {
     register,
     login,
-    refresh
+    refresh,
+    logout
 }
