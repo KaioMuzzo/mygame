@@ -5,6 +5,7 @@ import { prisma } from '../../lib/prisma';
 import { env } from '../../env';
 import { ErrorCode } from '../../constants/errorCodes';
 import { AppError } from '../../lib/AppError';
+import ms from 'ms';
 
 async function register(data: RegisterInput) {
     const hashedPassword = await bcrypt.hash(data.password, 12);
@@ -41,7 +42,18 @@ async function login(data: LoginInput) {
 
     if (await bcrypt.compare(data.password, user.password)) {
         const accessToken = jwt.sign({ sub: user.id }, env['JWT_SECRET'], { expiresIn: env['JWT_EXPIRES_IN'] });
-        return { accessToken };
+        const refreshToken = jwt.sign({ sub: user.id }, env['JWT_REFRESH_SECRET'], { expiresIn: env['JWT_REFRESH_EXPIRES_IN'] });
+        const expiresAt = new Date(Date.now() + ms(env['JWT_REFRESH_EXPIRES_IN']));
+        
+        await prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                userId: user.id,
+                expiresAt,
+            }
+        })
+
+        return { accessToken, refreshToken };
     } else {
         throw new AppError(ErrorCode.INVALID_CREDENTIALS, 401);
     }
