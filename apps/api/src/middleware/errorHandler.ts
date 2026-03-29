@@ -3,6 +3,7 @@ import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import { env } from "../env";
 import { ErrorCode } from "../constants/errorCodes";
+import { AppError } from "../lib/AppError";
 
 interface DriverAdapterMeta {
     cause?: {
@@ -17,8 +18,7 @@ function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFun
         const errors = Object.fromEntries(
             err.issues.map(issue => [issue.path[0], issue.message])
         );
-        res.status(400).json({ errors });
-        return;
+        return res.status(400).json({ errors });
     }
 
     if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
@@ -30,18 +30,19 @@ function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFun
         }
 
         if (index?.includes('username')) {
-            res.status(409).json({ code: ErrorCode.USERNAME_ALREADY_IN_USE });
-            return;
+            return res.status(409).json({ code: ErrorCode.USERNAME_ALREADY_IN_USE });
         }
 
         if (index?.includes('email')) {
-            res.status(409).json({ code: ErrorCode.EMAIL_ALREADY_IN_USE });
-            return;
+            return res.status(409).json({ code: ErrorCode.EMAIL_ALREADY_IN_USE });
         }
 
 
-        res.status(409).json({ code: ErrorCode.UNIQUE_CONSTRAINT_VIOLATION });
-        return;
+        return res.status(409).json({ code: ErrorCode.UNIQUE_CONSTRAINT_VIOLATION });
+    }
+
+    if (err instanceof AppError) {
+        return res.status(err.statusCode).json({ code: err.message });
     }
 
     console.error(err);
