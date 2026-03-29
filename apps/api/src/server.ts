@@ -1,14 +1,15 @@
 import express from 'express';
-import type { Request, Response, NextFunction } from 'express';
+import type { Request, Response } from 'express';
 import { env } from './env.js';
 import { prisma } from './lib/prisma.js';
 import { router } from './routes.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { globalLimiter } from './middleware/rateLimiter.js';
 
 const app = express();
 
 app.use(express.json({ limit: '10kb' }));
-
+app.use(globalLimiter);
 app.use(router);
 
 app.get('/health', (_req: Request, res: Response) => {

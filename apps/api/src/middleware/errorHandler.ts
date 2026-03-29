@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { NextFunction, Request, Response } from "express";
 import { ZodError } from "zod";
 import { env } from "../env";
+import { ErrorCode } from "../constants/errorCodes";
 
 interface DriverAdapterMeta {
     cause?: {
@@ -29,22 +30,22 @@ function errorHandler(err: unknown, _req: Request, res: Response, _next: NextFun
         }
 
         if (index?.includes('username')) {
-            res.status(409).json({ code: 'USERNAME_ALREADY_IN_USE' });
+            res.status(409).json({ code: ErrorCode.USERNAME_ALREADY_IN_USE });
             return;
         }
 
         if (index?.includes('email')) {
-            res.status(409).json({ code: 'EMAIL_ALREADY_IN_USE' });
+            res.status(409).json({ code: ErrorCode.EMAIL_ALREADY_IN_USE });
             return;
         }
 
 
-        res.status(409).json({ code: 'UNIQUE_CONSTRAINT_VIOLATION' });
+        res.status(409).json({ code: ErrorCode.UNIQUE_CONSTRAINT_VIOLATION });
         return;
     }
 
     console.error(err);
-    res.status(500).json({ code: 'INTERNAL_SERVER_ERROR' });
+    res.status(500).json({ code: ErrorCode.INTERNAL_SERVER_ERROR });
 }
 
 export { errorHandler }

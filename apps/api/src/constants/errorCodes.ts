@@ -1,0 +1,16 @@
+const ErrorCode = {
+    // Auth
+    USERNAME_ALREADY_IN_USE: 'USERNAME_ALREADY_IN_USE',
+    EMAIL_ALREADY_IN_USE: 'EMAIL_ALREADY_IN_USE',
+    UNIQUE_CONSTRAINT_VIOLATION: 'UNIQUE_CONSTRAINT_VIOLATION',
+
+    // Rate limiting
+    TOO_MANY_REQUESTS: 'TOO_MANY_REQUESTS',
+
+    // Server
+    INTERNAL_SERVER_ERROR: 'INTERNAL_SERVER_ERROR',
+} as const;
+
+export { ErrorCode }
+
+export type ErrorCode = typeof ErrorCode[keyof typeof ErrorCode];
